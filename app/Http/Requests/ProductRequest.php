@@ -35,6 +35,7 @@ class ProductRequest extends FormRequest
             'linked_phone' => 'nullable',
             'linked_email' => 'nullable',
             'more' => 'nullable',
+            'images.*' => 'mimes:jpg,jpeg,png|max:10000',
         ];
     }
 }

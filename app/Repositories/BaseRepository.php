@@ -4,6 +4,8 @@ namespace App\Repositories;
 
 use App\Contracts\Repositories\BaseRepositoryInterface;
 use Exception;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 
 abstract class BaseRepository implements BaseRepositoryInterface
@@ -16,13 +18,13 @@ abstract class BaseRepository implements BaseRepositoryInterface
     }
 
     /**
-     * @param string[] $columns
+     * @param array $columns
      * @param array $with
-     * @return mixed
+     * @return Builder[]|Collection
      */
-    public function getColumns($columns = ['*'], $with = []): mixed
+    public function getColumns(array $columns = ['*'], array $with= []): Collection|array
     {
-        return $this->model->select($columns)->with($with);
+        return $this->model::with($with)->get($columns);
     }
 
     /**
@@ -30,7 +32,7 @@ abstract class BaseRepository implements BaseRepositoryInterface
      * @param string[] $columns
      * @return mixed
      */
-    public function find($id, $columns = ['*']): mixed
+    public function find($id, array $columns = ['*']): mixed
     {
         return $this->model->findOrFail($id, $columns);
     }
@@ -47,7 +49,7 @@ abstract class BaseRepository implements BaseRepositoryInterface
     /**
      * @param Model $model
      * @param array $data
-     * @return bool|mixed
+     * @return bool
      */
     public function update(Model $model, array $data): mixed
     {

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Enums\MessageStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ProductRequest;
+use App\Models\Product;
 use App\Services\ProductService;
 use \Illuminate\Http\JsonResponse;
 
@@ -22,18 +23,41 @@ class ProductController extends Controller
         return response()->json([
             'message' => MessageStatus::SUCCESS,
             'data' => $this->productService->getAll()
-        ], 200);
+        ]);
     }
 
-    public function store(ProductRequest $request, ProductService $productService): JsonResponse
+    public function show(Product $product): JsonResponse
     {
-        $data = $request->input();
+        return response()->json([
+            'message' => MessageStatus::SUCCESS,
+            'data' => $this->productService->show($product),
+        ]);
+    }
+
+    public function store(ProductRequest $request): JsonResponse
+    {
+        $data = $request->validated();
         $product = $this->productService->store($data);
-        if($product) {
+        if ($product) {
             return response()->json([
                 'message' => MessageStatus::SUCCESS,
                 'data' => $product,
-            ], 200);
+            ]);
+        }
+        return response()->json([
+            'message' => MessageStatus::ERROR,
+        ], 400);
+    }
+
+    public function update(Product $product, ProductRequest $request): JsonResponse
+    {
+        $data = $request->validated();
+        $product = $this->productService->update($product, $data);
+        if ($product) {
+            return response()->json([
+                'message' => MessageStatus::SUCCESS,
+                'data' => $product,
+            ]);
         }
         return response()->json([
             'message' => MessageStatus::ERROR,

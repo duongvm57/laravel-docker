@@ -33,6 +33,8 @@ Route::group(['middleware' => 'api'], function () {
     Route::prefix('products')->group(function () {
         Route::get('/', [ProductController::class, 'index']);
         Route::post('/', [ProductController::class, 'store']);
+        Route::get('/{product}', [ProductController::class, 'show']);
+        Route::post('/{product}', [ProductController::class, 'update']);
     });
 });
 

@@ -2,14 +2,21 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
 
-class Product extends Model
+class Product extends Model implements HasMedia
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, InteractsWithMedia;
 
+    /**
+     * @var string[]
+     */
     protected $fillable = [
         'slug',
         'username',
@@ -27,13 +34,34 @@ class Product extends Model
     /**
      * @var string[]
      */
+    protected $appends = [
+        'images'
+    ];
+
+    /**
+     * @var string[]
+     */
     protected $hidden = [
         'username',
         'password',
+        'media',
     ];
 
-    public function category()
+    protected $casts = [
+        'linked_phone' => 'boolean',
+        'linked_email' => 'boolean',
+    ];
+
+    public function category(): BelongsTo
     {
-        return $this->belongsTo(Product::class);
+        return $this->belongsTo(Category::class);
+    }
+
+    protected function images(): Attribute
+    {
+        $mediaItems = $this->getMedia('products');
+        return Attribute::make(
+            get: fn () => $mediaItems->map->only('original_url', 'file_name', 'order_column'),
+        );
     }
 }
